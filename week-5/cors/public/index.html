@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cors</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.min.js"></script>
+</head>
+<body>
+    <input id="a" type="number">
+    <input id="b" type="number">
+    <button onclick="getSum()">sum</button>
+
+    <script>
+        function getSum() {
+            const a = document.getElementById("a").value;
+            const b = document.getElementById("b").value;
+            const data = axios.get("http://localhost:3000/sum",{
+                params:{
+                    a:a,
+                    b:b
+                }
+            })
+            data.then(response => {
+                console.log(response.data);
+            })
+            data.catch(err =>{
+                console.error(err);
+            })            
+        }
+    </script>
+</body>
+</html>
