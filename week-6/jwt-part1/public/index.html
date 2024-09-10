@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup/Signin Fullstack</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,body{
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: gray;
+            gap: 20px;
+        }
+        .signup{
+            width: 350px;
+            height: 200px;
+            background-color: aqua;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        input{
+            width: 80%;
+            height: 35px;
+            text-align: center;
+            border-radius: 5px;
+            border: none;
+        }
+        button{
+            width: 30%;
+            height: 30px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .signin{
+            width: 350px;
+            height: 200px;
+            background-color: aqua;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        #myinfo{
+            width: 350px;
+            height: 200px;
+            background-color: aqua;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="signup">
+        <h3>Sign Up</h3>
+        <input id="signup-text" type="text" placeholder="Enter username">
+        <input id="signup-pass" type="password" placeholder="Enter password">
+        <button onclick="signUp()">Submit</button>
+    </div>
+
+    <div class="signin">
+        <h3>Sign In</h3>
+        <input id="signin-text" type="text" placeholder="Enter username">
+        <input id="signin-pass" type="password" placeholder="Enter password">
+        <button onclick="signIn()">Submit</button>
+    </div>
+
+    <div id="myinfo">
+
+    </div>
+
+    <button id="logout" onclick="logout()">Logout</button>
+
+    <script>
+        const signUpText = document.getElementById("signup-text")
+        const signUpPass = document.getElementById("signup-pass")
+        const signInText = document.getElementById("signin-text")
+        const signInPass = document.getElementById("signin-pass")
+        const signUpDiv = document.querySelector(".signup")
+        const signInDiv = document.querySelector(".signin")
+        const userInfo = document.getElementById('myinfo')
+        const logoutBtn = document.getElementById("logout")
+
+        async function signUp(){
+            let signupValue = signUpText.value
+            let signupPass = signUpPass.value
+            await axios.post("http://localhost:3000/signup",{
+                username:signupValue,
+                password:signupPass
+            })
+            alert("You are completely signup!!!")
+        }
+
+        async function signIn(){
+
+            let signinValue = signInText.value
+            let signinPass = signInPass.value
+
+            try {
+                
+                const response = await axios.post("http://localhost:3000/signin",{
+                    username:signinValue,
+                    password:signinPass
+                })
+                localStorage.setItem("token",response.data.token)
+                alert("You are successfully login!!!")
+                await getInfo(response.data.token)
+            } catch (error) {
+                console.log(error);
+                
+            }
+            
+
+        }
+        async function getInfo(token) {
+            // const token = localStorage.getItem("token")
+            
+            const response = await axios.get("http://localhost:3000/me",{
+                headers:{
+                    token:token
+                }
+            })
+            console.log(response);
+            
+            const username = response.data.username
+            let h2first = document.createElement("h2")
+            userInfo.appendChild(h2first)
+            h2first.innerText = `Name: ${username}`
+            isLogin()
+        }
+        function logout(){
+            localStorage.removeItem("token")
+            location.reload()
+
+        }
+        
+        function isLogin(){
+            const token = localStorage.getItem("token")
+            if(!token){
+                userInfo.style.display = "none"
+                logoutBtn.style.display ="none"
+                signUpDiv.style.display = "flex"
+                signInDiv.style.display = "flex"
+            }else{
+                signUpDiv.style.display = "none"
+                signInDiv.style.display = "none"
+                userInfo.style.display = "flex"
+                logoutBtn.style.display ="block"
+            }
+        }
+        isLogin()
+    </script>
+</body>
+</html>
